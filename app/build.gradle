@@ -1,0 +1,135 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-parcelize'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'com.google.devtools.ksp' version "1.7.0-1.0.6"
+}
+
+apply from: 'dependencies.gradle'
+
+def apiKeyPropertiesFile = rootProject.file("api_key.properties")
+def apiKeyProperties = new Properties()
+apiKeyProperties.load(new FileInputStream(apiKeyPropertiesFile))
+
+android {
+    namespace 'com.githukudenis.baibo'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.githukudenis.baibo"
+        minSdk 24
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+
+        buildConfigField("String", "API_KEY", apiKeyProperties['API_KEY'])
+    }
+
+    kotlin {
+        sourceSets {
+            debug {
+                kotlin.srcDir("build/generated/ksp/debug/kotlin")
+            }
+            release {
+                kotlin.srcDir("build/generated/ksp/release/kotlin")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion compose_version
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+dependencies {
+
+    // Core
+    implementation androidSdkDependencies.core
+
+    // Image Loading
+    implementation landscapist.glide
+
+    // Api call
+    implementation apiDependencies.retrofit
+    implementation apiDependencies.gson
+    implementation apiDependencies.okhttp
+    implementation apiDependencies.okhttpLogging
+
+    //Ksp Compose Destinations
+    implementation ksp.kspComposeDestinationsCore
+    ksp ksp.kspComposeDestinations
+
+    //Firebase crashlytics
+//    implementation firebase.crashlytics
+//    implementation firebase.analytics
+
+    //Coroutines
+    implementation coroutinesDependencies.core
+    implementation coroutinesDependencies.coreAndroid
+
+    //Accompanist permissions
+    implementation accompanistPermissions.permissions
+
+    //Room
+    implementation room.roomRuntime
+    implementation room.roomKtx
+    kapt room.roomAnnotationProcessor
+
+    // Compose
+    implementation composeDependencies.viewmodelCompose
+    implementation composeDependencies.navigationCompose
+    implementation composeDependencies.runtime
+    implementation composeDependencies.activity
+    implementation composeDependencies.composeUi
+    implementation composeDependencies.composeUiToolingPreview
+    implementation composeDependencies.material
+
+    // Lifecycle
+    implementation lifecycleDependencies.viewmodelktx
+    implementation lifecycleDependencies.runtimektx
+
+    //Dagger Hilt
+    implementation daggerHilt.hiltAndroid
+    implementation daggerHilt.hiltComposeNavigation
+    kapt daggerHilt.hiltCompilerKapt
+    kapt daggerHilt.hiltAndroidCompilerKapt
+
+    //Material
+    implementation material.materialExtendedIcons
+
+    //Testing
+    testImplementation testDependencies.junit
+    androidTestImplementation testDependencies.testExt
+    androidTestImplementation testDependencies.espresso
+    androidTestImplementation testDependencies.composeUiTest
+    debugImplementation testDependencies.composeUiToolingTest
+    debugImplementation testDependencies.composeUiTestManifest
+}
