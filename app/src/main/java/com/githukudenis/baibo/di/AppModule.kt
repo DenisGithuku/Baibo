@@ -1,10 +1,11 @@
 package com.githukudenis.baibo.di
 
 import com.githukudenis.baibo.data.remote.api.BibleApiService
-import com.githukudenis.baibo.data.repository.BooksRepositoryImpl
-import com.githukudenis.baibo.domain.repository.BooksRepository
-import com.githukudenis.baibo.domain.usecase.BooksUseCases
-import com.githukudenis.baibo.domain.usecase.GetAllBooks
+import com.githukudenis.baibo.data.repository.BibleRepositoryImpl
+import com.githukudenis.baibo.domain.repository.BibleRepository
+import com.githukudenis.baibo.domain.usecase.BibleUseCases
+import com.githukudenis.baibo.domain.usecase.GetAllBibles
+import com.githukudenis.baibo.domain.usecase.GetAllVersesByBibleAndPassage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,15 +18,16 @@ object AppModule {
 
     @Provides
     @ViewModelScoped
-    fun provideBookUseCases(booksRepository: BooksRepository): BooksUseCases {
-        return BooksUseCases(
-            getAllBooks = GetAllBooks(booksRepository)
+    fun provideBookUseCases(bibleRepository: BibleRepository): BibleUseCases {
+        return BibleUseCases(
+            getAllBibles = GetAllBibles(bibleRepository),
+            getAllVersesByBibleAndPassage = GetAllVersesByBibleAndPassage(bibleRepository)
         )
     }
 
     @Provides
     @ViewModelScoped
-    fun provideBooksRepository(bibleApiService: BibleApiService): BooksRepository {
-        return BooksRepositoryImpl(bibleApiService = bibleApiService)
+    fun provideBooksRepository(bibleApiService: BibleApiService): BibleRepository {
+        return BibleRepositoryImpl(bibleApiService = bibleApiService)
     }
 }
